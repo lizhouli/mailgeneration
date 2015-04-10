@@ -72,12 +72,12 @@ class JiraReader
 
 end
 
-reader = JiraReader.new
+#reader = JiraReader.new
 #reader.read_from_file
-reader.read_status
-reader.read_title
-reader.read_last_update
-reader.test_reader
+#reader.read_status
+#reader.read_title
+#reader.read_last_update
+#reader.test_reader
 
 
 

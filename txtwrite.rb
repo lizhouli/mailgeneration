@@ -1,4 +1,8 @@
-require_relative "mail"
+require_relative "parser"
+
+class Writer
+end
+
 
 reader = JiraReader.new
 reader.read_title
