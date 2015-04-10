@@ -4,7 +4,6 @@ require 'open-uri'
 class JiraReader
 	def initialize()
         @doc = Nokogiri::HTML(open('6072.html'))
-        @ofile = File.open("mail.txt", "w")
         @ids = []
         @assignees = []
         @statuss = []
@@ -60,6 +59,14 @@ class JiraReader
             end
         end
         end
+    end
+
+    def get_one_jira(idx)
+        [@ids[idx], @titles[idx], @assignees[idx], @statuss[idx], @labels[idx], @comments[idx]]
+    end
+
+    def get_jira_count
+        @ids.size()
     end
 
     def test_reader
