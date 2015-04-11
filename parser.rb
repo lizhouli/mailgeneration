@@ -3,8 +3,7 @@ require 'open-uri'
 
 class JiraReader
 	def initialize()
-        @doc = Nokogiri::HTML(open('6072.html'))
-        @ids = [6072]
+        @ids = []
         @assignees = []
         @statuss = []
         @labels = []
@@ -14,23 +13,23 @@ class JiraReader
 
     def read_from_file
         idfile = File.open("jira.txt", "r")
-        idfile.each { |line| @ids << ('http://jira' + line.to_s) }
+        idfile.each { |line| @ids << ('http://jira.arm.com/browse/MJOLL-' + line.to_s).chomp }
         @ids.uniq!
     end
 
     def read_status
         items = @doc.xpath("//span")
         items.each do |item|
-            @statuss << item.text.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?('status-val') 
-            @labels << item.text if item.at_xpath("@class") && item.at_xpath("@class").text.include?('labels')
-            @assignees << item.text if item.at_xpath("@id") && item.at_xpath("@id").text.include?('assignee')
+            @statuss << item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?('status-val') 
+            @labels << item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@class") && item.at_xpath("@class").text.include?('labels')
+            @assignees << item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?('assignee-val')
         end
     end
 
     def read_title
         items = @doc.xpath("//h1")
         items.each do |item|
-            @titles << item.text.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?("summary-val")
+            @titles << item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?("summary-val")
         end
     end
 
@@ -40,14 +39,15 @@ class JiraReader
         items.each do |item|
             last_update = item.text if item.at_xpath("@class") && item.at_xpath("@class").text.include?("action-body flooded")
         end
-        @comments << last_update.gsub(/[\n\r]/, "")
+        @comments << last_update.strip#.gsub(/[\n\r]/, "")
     end
 
     def read_all
         read_from_file
         @ids.each do |ticket|
         begin
-            @doc = Nokogiri::HTML(open(ticket))
+            @doc = Nokogiri::HTML(open(ticket,
+                                        :http_basic_authentication => ["name", "password"]))
             read_title
             read_status
             read_last_update
@@ -55,7 +55,7 @@ class JiraReader
             if e.message == '404 not found'
                 puts "404 error"
             else
-                puts "#{ticket} can't be opened"
+                puts "#{ticket} can't be opened #{e}"
                 raise e
             end
         end
@@ -71,22 +71,19 @@ class JiraReader
     end
 
     def test_reader
+        puts "id size = #{@ids.size()}"
         puts @ids
+        puts "title size = #{@titles.size()}"
         puts @titles
+        puts "assignee size = #{@assignees.size()}"
         puts @assignees
+        puts "status size = #{@statuss.size()}"
         puts @statuss
+        puts "labels size = #{@labels.size()}"
         puts @labels
+        puts "comments size = #{@comments.size()}"
         puts @comments
     end
 
 end
-
-#reader = JiraReader.new
-#reader.read_from_file
-#reader.read_status
-#reader.read_title
-#reader.read_last_update
-#reader.test_reader
-
-
 

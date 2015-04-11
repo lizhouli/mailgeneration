@@ -13,13 +13,17 @@ module Writer
         "(#{engineer})"
     end
 
+    def write_status(status)
+        "- #{status}\n"
+    end 
+
     # just like "unplanned" task
     def write_special_flag(flag)
         flag == "unplanned" ? "(${flag})\n" : "\n"
     end
 
     def write_comment(comment)
-        "- #{comment}"
+        "- #{comment}\n"
     end
 end
 
@@ -30,7 +34,7 @@ class Textwriter
     end
 
     def write(data)
-        id = data[0]
+        id = data[0].to_s.gsub(/^.*MJOLL-/, "")
         title = data[1]
         assignee = data[2]
         status = data[3]
@@ -39,6 +43,8 @@ class Textwriter
         if (status.to_s.length() > 0)
             @ofile.write write_id(id) + write_title(title) + write_assignee(assignee) + write_special_flag(label)
             @ofile.write write_comment(comment)
+            @ofile.write write_status(status)
+            @ofile.write("\n")
         end
     end
 
@@ -46,13 +52,11 @@ end
 
 
 reader = JiraReader.new
-reader.read_title
-reader.read_status
-reader.read_last_update
-reader.test_reader
+reader.read_all
+#reader.test_reader
 
 txt = Textwriter.new("mail.txt")
-for i in 0..reader.get_jira_count
+for i in 0..reader.get_jira_count-1
     txt.write(reader.get_one_jira(i))
 end
 
