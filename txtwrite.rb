@@ -2,11 +2,11 @@ require_relative "parser"
 
 module Writer
     def write_id(id)
-        "[MJOLL-#{id}]:"
+        "[MJOLL-#{id}]: "
     end
 
     def write_title(title)
-        "#{title}"
+        "#{title} "
     end
 
     def write_assignee(engineer)
@@ -14,23 +14,32 @@ module Writer
     end
 
     # just like "unplanned" task
-    def write_special_flag
-       "unplanned" 
+    def write_special_flag(flag)
+        flag == "unplanned" ? "(${flag})\n" : "\n"
     end
 
     def write_comment(comment)
-        "#{comment}"
+        "- #{comment}"
     end
 end
 
 class Textwriter
     include Writer
     def initialize(filename)
-        @ofile = File.open(filename, "w")
+        @ofile = File.open(filename, "w+")
     end
 
     def write(data)
-        puts "sleep..."
+        id = data[0]
+        title = data[1]
+        assignee = data[2]
+        status = data[3]
+        label = data[4]
+        comment = data[5]
+        if (status.to_s.length() > 0)
+            @ofile.write write_id(id) + write_title(title) + write_assignee(assignee) + write_special_flag(label)
+            @ofile.write write_comment(comment)
+        end
     end
 
 end
