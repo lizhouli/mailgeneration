@@ -17,20 +17,30 @@ class JiraReader
         @ids.uniq!
     end
 
+    # not so elegant and may have bugs inside, at least it can guarantee all arrays have the same array size and 
+    # for one jira, only one item will be recorded
     def read_status
         items = @doc.xpath("//span")
+        status = ""
+        label = ""
+        assignee = ""
         items.each do |item|
-            @statuss << item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?('status-val') 
-            @labels << item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@class") && item.at_xpath("@class").text.include?('labels')
-            @assignees << item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?('assignee-val')
+            status = item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?('status-val') 
+            label = item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@class") && item.at_xpath("@class").text.include?('labels')
+            assignee = item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?('assignee-val')
         end
+        @statuss << status
+        @labels << label
+        @assignees << assignee
     end
 
     def read_title
         items = @doc.xpath("//h1")
+        title = ""
         items.each do |item|
-            @titles << item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?("summary-val")
+            title << item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?("summary-val")
         end
+        @titles << title
     end
 
     def read_last_update

@@ -40,7 +40,7 @@ class Textwriter
         status = data[3]
         label = data[4]
         comment = data[5]
-        if (status.to_s.length() > 0)
+        if (status != "new")
             @ofile.write write_id(id) + write_title(title) + write_assignee(assignee) + write_special_flag(label)
             @ofile.write write_comment(comment)
             @ofile.write write_status(status)
@@ -53,7 +53,6 @@ end
 
 reader = JiraReader.new
 reader.read_all
-#reader.test_reader
 
 txt = Textwriter.new("mail.txt")
 for i in 0..reader.get_jira_count-1
