@@ -51,7 +51,7 @@ class Textwriter
 end
 
 
-reader = JiraReader.new
+reader = JiraReader.new("jira.txt")
 reader.read_all
 
 txt = Textwriter.new("mail.txt")

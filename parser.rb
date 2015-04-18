@@ -2,7 +2,8 @@ require 'nokogiri'
 require 'open-uri'
 
 class JiraReader
-	def initialize()
+	def initialize(filename)
+        @file = filename
         @ids = []
         @assignees = []
         @statuss = []
@@ -12,7 +13,7 @@ class JiraReader
 	end
 
     def read_from_file
-        idfile = File.open("jira.txt", "r")
+        idfile = File.open(@file, "r")
         idfile.each { |line| @ids << ('http://jira.arm.com/browse/MJOLL-' + line.to_s).chomp }
         @ids.uniq!
     end
