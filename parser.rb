@@ -13,7 +13,7 @@ class JiraReader
 
     def read_from_file
         idfile = File.open("jira.txt", "r")
-        idfile.each { |line| @ids << ('http://jira.arm.com/browse/MJOLL-' + line.to_s).chomp }
+        idfile.each { |line| @ids << ('htmhead' + line.to_s).chomp }
         @ids.uniq!
     end
 
