@@ -49,7 +49,7 @@ class JiraReader
             last_update = item.text if item.at_xpath("@class") && item.at_xpath("@class").text.include?("action-body flooded")
         end
         @labels << (label.match(/^unplan/) ? "unplanned" : "")
-        @comments << last_update.strip#.gsub(/[\n\r]/, "")
+        @comments << last_update.strip.gsub(/[\n\r]/, "<br />")
     end
 
     def read_all
