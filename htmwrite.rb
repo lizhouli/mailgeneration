@@ -350,7 +350,7 @@ HEAD
 
     # just like "unplanned" task
     def write_special_flag(flag)
-        flag == "unplanned" ? "(#{flag})\n" : "\n"
+        flag == "unplanned" ? " (#{flag})\n" : "\n"
     end
 
     def write_indent_1(desc)
@@ -388,6 +388,11 @@ class Htmwriter
         @ofile = File.open(filename, "w+")
     end
 
+    def write_title_1(des)
+        @ofile.write write_head
+        @ofile.write write_indent_1(des)
+    end
+
     def write(data)
         id = data[0].to_s.gsub(/^.*MJOLL-/, "")
         title = data[1]
@@ -395,8 +400,6 @@ class Htmwriter
         status = data[3]
         label = data[4]
         comment = data[5]
-        @ofile.write write_head
-        @ofile.write write_indent_1("Jira")
         headstr = write_id(id) + write_title(title) + write_assignee(assignee) + write_special_flag(label)
         @ofile.write write_indent_2(headstr)         
         @ofile.write write_indent_3(comment)
@@ -406,9 +409,11 @@ class Htmwriter
 end
 
 
-reader = JiraReader.new("jira.txt")
+reader = JiraReader.new
+reader.read_all
 
 txt = Htmwriter.new("mail.htm")
+txt.write_title_1("Jira")
 for i in 0..reader.get_jira_count-1
     txt.write(reader.get_one_jira(i))
 end

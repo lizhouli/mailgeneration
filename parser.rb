@@ -2,8 +2,7 @@ require 'nokogiri'
 require 'open-uri'
 
 class JiraReader
-	def initialize(filename)
-        @file = filename
+	def initialize()
         @ids = []
         @assignees = []
         @statuss = []
@@ -13,7 +12,7 @@ class JiraReader
 	end
 
     def read_from_file
-        idfile = File.open(@file, "r")
+        idfile = File.open("jira.txt", "r")
         idfile.each { |line| @ids << ('http://jira.arm.com/browse/MJOLL-' + line.to_s).chomp }
         @ids.uniq!
     end
@@ -23,15 +22,12 @@ class JiraReader
     def read_status
         items = @doc.xpath("//span")
         status = ""
-        label = ""
         assignee = ""
         items.each do |item|
             status = item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?('status-val') 
-            label = item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@class") && item.at_xpath("@class").text.include?('labels')
             assignee = item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@id") && item.at_xpath("@id").text.include?('assignee-val')
         end
         @statuss << status
-        @labels << label
         @assignees << assignee
     end
 
@@ -47,9 +43,12 @@ class JiraReader
     def read_last_update
         items = @doc.xpath("//div")
         last_update = ""
+        label = ""
         items.each do |item|
+            label = item.text.strip.gsub(/[\n\r]/, "") if item.at_xpath("@class") && item.at_xpath("@class").text.include?('labels')
             last_update = item.text if item.at_xpath("@class") && item.at_xpath("@class").text.include?("action-body flooded")
         end
+        @labels << (label.match(/^unplan/) ? "unplanned" : "")
         @comments << last_update.strip#.gsub(/[\n\r]/, "")
     end
 
