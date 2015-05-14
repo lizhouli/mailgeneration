@@ -4,29 +4,29 @@ require_relative "parser"
 module Outlookformat
     def write_head
 <<HEAD
-    User-Agent: Microsoft-MacOutlook/14.4.8.150116
-    Date: Wed, 13 May 2015 21:52:24 +0800
-    Subject: Re: weekly report (5/4--5/8)
-    From: Frank Li <frank.li@arm.com>
-    Message-ID: <D1797733.36BF%frank.li@arm.com>
-    Thread-Topic: weekly report (5/4--5/8)
-    References: <D176358C.34FF%frank.li@arm.com>
-    In-Reply-To: <D176358C.34FF%frank.li@arm.com>
-    Mime-version: 1.0
-    Content-type: multipart/alternative;
+User-Agent: Microsoft-MacOutlook/14.4.8.150116
+Date: Wed, 13 May 2015 21:52:24 +0800
+Subject: weekly report (5/4--5/8)
+From: Frank Li <frank.li@arm.com>
+Message-ID: <D1797733.36BF%frank.li@arm.com>
+Thread-Topic: weekly report (5/4--5/8)
+References: <D176358C.34FF%frank.li@arm.com>
+In-Reply-To: <D176358C.34FF%frank.li@arm.com>
+Mime-version: 1.0
+Content-type: multipart/alternative;
     boundary="B_3514398760_200213"
 
-    > This message is in MIME format. Since your mail reader does not understand
-    this format, some or all of this message may not be legible.
+> This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
 
-    --B_3514398760_200213
-    Content-type: text/html;
-    charset="US-ASCII"
-    Content-transfer-encoding: quoted-printable
+--B_3514398760_200213
+Content-type: text/html;
+charset="US-ASCII"
+Content-transfer-encoding: quoted-printable
 
-    <html><head></head><body style=3D"word-wrap: break-word; -webkit-nbsp-mode: s=
-    pace; -webkit-line-break: after-white-space; color: rgb(24, 54, 105); font-f=
-    amily: Calibri, sans-serif;"><div>
+<html><head></head><body style=3D"word-wrap: break-word; -webkit-nbsp-mode: s=
+pace; -webkit-line-break: after-white-space; color: rgb(24, 54, 105); font-f=
+amily: Calibri, sans-serif;"><div>
 HEAD
     end
 
@@ -53,13 +53,13 @@ HEAD
 
     def write_indent_1(desc)
 <<IND1
-    <li style=3D"font-size: 15px;">Jira</li>=
+<li style=3D"font-size: 15px;">#{desc}</li>=
 IND1
     end
 
     def write_indent_2(desc)
 <<IND2
-    <li>#{decs}</li>
+<li>#{desc}</li>
 IND2
     end
 
@@ -768,7 +768,7 @@ END
     end
 end
 
-class Mail2011writer
+class Mailwriter
     include Outlookformat 
     def initialize(filename)
         @ofile = File.open(filename, "w+")
@@ -778,21 +778,21 @@ class Mail2011writer
         @ofile.write write_indent_1(des)
     end
 
-    def write_head
+    def write_head_for_title
         @ofile.write write_head
         @ofile.write write_ul_start
     end
 
-    def write_end
+    def write_end_for_title
         @ofile.write write_ul_end
         @ofile.write write_end
     end
 
-    def write_ul2_start
+    def write_head_for_ul
         @ofile.write write_ul2_start
     end
 
-    def write_ul_end
+    def write_end_for_ul
         @ofile.write write_ul_end
     end
 
@@ -816,13 +816,12 @@ end
 reader = JiraReader.new
 reader.read_all
 
-txt = Mail2011writer.new("report.eml")
-txt.write_head
+txt = Mailwriter.new("report.eml")
+txt.write_head_for_title
 txt.write_title_1("Jira")
-txt.write_ul2_start
+txt.write_head_for_ul
 for i in 0..reader.get_jira_count-1
     txt.write(reader.get_one_jira(i))
 end
-txt.write_ul_end
-txt.write_title_1("Support Case")
-txt.write_end
+txt.write_end_for_ul
+txt.write_end_for_title
